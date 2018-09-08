@@ -59,15 +59,18 @@ class App extends React.Component {
         ).then(([empResponse, schema]) => {
             this.schema = schema;
             this.setState({
+                order: 'asc',
+                orderBy: 'firstName',
                 employees: empResponse._embedded.employees,
                 attributes: Object.keys(schema.properties),
                 pageSize: pageSize,
-                links: empResponse._links
+                links: empResponse._links,
+                page: 0,
+                selected: [],
             })
         }).catch(error => {
             console.log(error)
         });
-
     }
  
     componentDidMount() {
@@ -75,13 +78,17 @@ class App extends React.Component {
     }
     
     render() {
+
+        const { employees, order, orderBy, page } = this.state;
+
         return (
         
-        <div>
+            <div>
                 <EmployeeMui 
                 employees = {this.state.employees} 
                 links = {this.state.links}  
                 onNavigate = {this.onNavigate}
+
                 />
         {/* <EmployeeList 
             employees = {this.state.employees}  
@@ -173,8 +180,7 @@ class EmployeeList extends React.Component {
             <TableBody>
                 {employees}
             </TableBody>  
-            </Table>                  
-				{navLinks}			
+            </Table>                  							
         </Paper> 
         )
     }

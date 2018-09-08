@@ -9,20 +9,66 @@ import TableRow from '@material-ui/core/TableRow';
 import Paper from '@material-ui/core/Paper';
 import Pagination from './pagination';
 
-// var id = 0;
-// function createData(name, calories, fat, carbs, protein) {
-//     id += 1;
-//     return { id, name, calories, fat, carbs, protein };
-//   }
 
-// const rows = [
-// createData('Frozen yoghurt', 159, 6.0, 24, 4.0),
-// createData('Ice cream sandwich', 237, 9.0, 37, 4.3),
-// createData('Eclair', 262, 16.0, 24, 6.0),
-// createData('Cupcake', 305, 3.7, 67, 4.3),
-// createData('Gingerbread', 356, 16.0, 49, 3.9),
-// ];  
+const rows = [
+    { id: 'firstName', numeric: false, disablePadding: true, label: 'First Name' },
+    { id: 'lastName', numeric: false, disablePadding: false, label: 'Last Name' },
+    { id: 'description', numeric: false, disablePadding: false, label: 'Description' },    
+  ];
 
+class EnhancedTableHead extends React.Component {
+    render() {
+        const {order, orderBy, numSelected, rowCount } = this.props;
+
+        return (
+            <TableHead>
+                <TableRow>
+                <TableCell padding="checkbox">
+                    <Checkbox
+                    indeterminate={numSelected > 0 && numSelected < rowCount}
+                    checked={numSelected === rowCount}
+                    // onChange={onSelectAllClick}
+                    />
+                </TableCell>
+                {rows.map(row => {
+                    return (
+                    <TableCell
+                        key={row.id}
+                        numeric={row.numeric}
+                        padding={row.disablePadding ? 'none' : 'default'}
+                        sortDirection={orderBy === row.id ? order : false}
+                    >
+                        <Tooltip
+                        title="Sort"
+                        placement={row.numeric ? 'bottom-end' : 'bottom-start'}
+                        enterDelay={300}
+                        >
+                        <TableSortLabel
+                            active={orderBy === row.id}
+                            direction={order}
+                            onClick={this.createSortHandler(row.id)}
+                        >
+                            {row.label}
+                        </TableSortLabel>
+                        </Tooltip>
+                    </TableCell>
+                    );
+                }, this)}
+                </TableRow>
+            </TableHead>            
+        )
+    }
+
+}
+
+EnhancedTableHead.propTypes = {
+    // numSelected: PropTypes.number.isRequired,
+    // onRequestSort: PropTypes.func.isRequired,
+    // onSelectAllClick: PropTypes.func.isRequired,
+    order: PropTypes.string.isRequired,
+    orderBy: PropTypes.string.isRequired,
+    rowCount: PropTypes.number.isRequired,
+  };
 
 
 const CustomTableCell = withStyles(theme => ({
@@ -58,21 +104,30 @@ class CustomizedTable extends React.Component {
     }
 
     render(){
-        const { classes } = this.props;
-        const { employees } = this.props;
-        const { links } = this.props;
+        const { classes } = this.props;        
         const { theme } = this.props;
+        const { employees, links } = this.props;
+
+        
         var pagination = <Pagination links={links} onNavigate={this.props.onNavigate} />
         return (
             <Paper className={classes.root}>
                 <Table className={classes.table}>
-                <TableHead>
+                {/* <TableHead>
                     <TableRow>
                     <CustomTableCell >First Name</CustomTableCell>
                     <CustomTableCell >Last Name</CustomTableCell>
                     <CustomTableCell >Description</CustomTableCell>                    
                     </TableRow>
-                </TableHead>
+                </TableHead> */}
+
+                <EnhancedTableHead
+                    // numSelected={selected.length}
+                    order={order}
+                    orderBy={orderBy}
+                    // onSelectAllClick={this.handleSelectAllClick}
+                    rowCount={employees.length}
+                />
                 <TableBody >
                         {employees.map(employee => {
                         return (
