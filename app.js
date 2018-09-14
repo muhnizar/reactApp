@@ -11,13 +11,13 @@ import TableHead from '@material-ui/core/TableHead';
 import TableRow from '@material-ui/core/TableRow';
 import Paper from '@material-ui/core/Paper';
 import EmployeeMui from './employeeMui';
-
+import Demo from './demo';
 
 class App extends React.Component {
 
     constructor(props) {
         super(props);
-        this.state = {employees: [], attributes: [], pageSize: 2, links: {}};        
+        this.state = {employees: [], attributes: [], pageSize: 3, links: {}};        
         this.onNavigate = this.onNavigate.bind(this);
     }
 
@@ -78,17 +78,12 @@ class App extends React.Component {
     }
     
     render() {
-
-        const { employees, order, orderBy, page } = this.state;
-
-        return (
-        
+        return (        
             <div>
                 <EmployeeMui 
                 employees = {this.state.employees} 
                 links = {this.state.links}  
                 onNavigate = {this.onNavigate}
-
                 />
         {/* <EmployeeList 
             employees = {this.state.employees}  
@@ -103,6 +98,8 @@ class App extends React.Component {
         )        
     }
 }
+
+
 class EmployeeList extends React.Component {
     constructor(props) {
         super(props);        
@@ -205,5 +202,6 @@ class Employee extends React.Component {
 
 ReactDOM.render(
     <App />,
+    // <Demo />,
     document.getElementById('react')
 )

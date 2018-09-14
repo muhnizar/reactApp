@@ -7,12 +7,11 @@ import LastPageIcon from '@material-ui/icons/LastPage';
 import KeyboardArrowLeft from '@material-ui/icons/KeyboardArrowLeft';
 import KeyboardArrowRight from '@material-ui/icons/KeyboardArrowRight';
 
-const actionsStyles = theme => ({
+const paginationStyles = theme => ({
     root: {
-      flexShrink: 0,
-      color: theme.palette.text.secondary,
-      marginLeft: theme.spacing.unit * 2.5,
+        textAlign: 'right',
     },
+
   });
 
 class CustomizedTablePagination extends React.Component {
@@ -46,6 +45,7 @@ class CustomizedTablePagination extends React.Component {
     }
     
     render() {
+        const { classes } = this.props;
         const { theme } = this.props;
         
         var navLinks = [];
@@ -65,9 +65,9 @@ class CustomizedTablePagination extends React.Component {
         }
         
         return(
-            <div>
+            <div className={classes.root}>
                 {navLinks}            
-                </div>
+            </div>
         )
     }
 
@@ -78,4 +78,4 @@ CustomizedTablePagination.propTypes = {
     theme: PropTypes.object.isRequired,
   };
 
-  export default withStyles(actionsStyles, { withTheme: true } )(CustomizedTablePagination);
+  export default withStyles(paginationStyles, { withTheme: true } )(CustomizedTablePagination);
