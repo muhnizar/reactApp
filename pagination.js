@@ -46,23 +46,13 @@ class CustomizedTablePagination extends React.Component {
     
     render() {
         const { classes } = this.props;
-        const { theme } = this.props;
         
         var navLinks = [];
 
-        
-        if ("first" in this.props.links){
-            navLinks.push(<IconButton onClick={this.handleNavFirst} key="first"> {theme.direction === 'rtl' ? <LastPageIcon /> : <FirstPageIcon />}</IconButton>)
-        }
-        if ("prev" in this.props.links){
-            navLinks.push(<IconButton onClick={this.handleNavPrev} key="prev">  {theme.direction === 'rtl' ? <KeyboardArrowRight /> : <KeyboardArrowLeft />}</IconButton>)
-        }
-        if ("next" in this.props.links){
-            navLinks.push(<IconButton onClick={this.handleNavNext} key="next"> {theme.direction === 'rtl' ? <KeyboardArrowLeft /> : <KeyboardArrowRight />}</IconButton>)
-        }
-        if ("last" in this.props.links){
-            navLinks.push(<IconButton onClick={this.handleNavLast} key="last"> {theme.direction === 'rtl' ? <FirstPageIcon /> : <LastPageIcon />}</IconButton>)
-        }
+        navLinks.push(<IconButton disabled={!("prev" in this.props.links)} onClick={this.handleNavFirst} key="first">  <FirstPageIcon/></IconButton>)
+        navLinks.push(<IconButton disabled={!("prev" in this.props.links)} onClick={this.handleNavPrev} key="prev">  <KeyboardArrowLeft /></IconButton>)
+        navLinks.push(<IconButton disabled={!("next" in this.props.links)} onClick={this.handleNavNext} key="next"> <KeyboardArrowRight /> </IconButton>)
+        navLinks.push(<IconButton disabled={!("next" in this.props.links)} onClick={this.handleNavLast} key="last"> <LastPageIcon /></IconButton>)
         
         return(
             <div className={classes.root}>
@@ -70,7 +60,6 @@ class CustomizedTablePagination extends React.Component {
             </div>
         )
     }
-
 }
 
 CustomizedTablePagination.propTypes = {

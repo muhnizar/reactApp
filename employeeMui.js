@@ -10,6 +10,86 @@ import TableRow from '@material-ui/core/TableRow';
 import Paper from '@material-ui/core/Paper';
 import Pagination from './pagination';
 import Checkbox from '@material-ui/core/Checkbox';
+import { lighten } from '@material-ui/core/styles/colorManipulator';
+import Toolbar from '@material-ui/core/Toolbar';
+import Typography from '@material-ui/core/Typography';
+import Tooltip from '@material-ui/core/Tooltip';
+import DeleteIcon from '@material-ui/icons/Delete';
+import IconButton from '@material-ui/core/IconButton';
+import FilterListIcon from '@material-ui/icons/FilterList';
+
+
+const toolbarStyles = theme => ({
+    root: {
+      paddingRight: theme.spacing.unit,
+    },
+    highlight:
+      theme.palette.type === 'light'
+        ? {
+            color: theme.palette.secondary.main,
+            backgroundColor: lighten(theme.palette.secondary.light, 0.85),
+          }
+        : {
+            color: theme.palette.text.primary,
+            backgroundColor: theme.palette.secondary.dark,
+          },
+    spacer: {
+      flex: '1 1 100%',
+    },
+    actions: {
+      color: theme.palette.text.secondary,
+    },
+    title: {
+      flex: '0 0 auto',
+    },
+  });
+
+let EnhancedTableToolbar = props => {
+    const { numSelected, classes } = props;
+  
+    return (
+      <Toolbar
+        className={classNames(classes.root, {
+          [classes.highlight]: numSelected > 0,
+        })}
+      >
+        <div className={classes.title}>
+          {numSelected > 0 ? (
+            <Typography color="inherit" variant="subheading">
+              {numSelected} selected
+            </Typography>
+          ) : (
+            <Typography variant="title" id="tableTitle">
+              Employee
+            </Typography>
+          )}
+        </div>
+        <div className={classes.spacer} />
+        <div className={classes.actions}>
+          {numSelected > 0 ? (
+            <Tooltip title="Delete">
+              <IconButton aria-label="Delete">
+                <DeleteIcon />
+              </IconButton>
+            </Tooltip>
+          ) : (
+            <Tooltip title="Filter list">
+              <IconButton aria-label="Filter list">
+                {/* <FilterListIcon /> */}
+              </IconButton>
+            </Tooltip>
+          )}
+        </div>
+      </Toolbar>
+    );
+  };
+  
+  EnhancedTableToolbar.propTypes = {
+    classes: PropTypes.object.isRequired,
+    numSelected: PropTypes.number.isRequired,
+  };
+
+EnhancedTableToolbar = withStyles(toolbarStyles)(EnhancedTableToolbar);
 
 const rows = [
     { id: 'firstName', numeric: false, disablePadding: true, label: 'First Name' },
@@ -20,16 +100,24 @@ const rows = [
 class EnhancedTableHead extends React.Component {
     
     render() {
-        const {isSelectedAll ,onSelectAllClick, order, orderBy, numSelected, rowCount } = this.props;
+        // const {pageData, onSelectAllClick, numSelected, rowCount, order, orderBy } = this.props;
+        const {order, orderBy } = this.props;
         return (
             <TableHead>
                 <TableRow>
                 <TableCell padding="checkbox">
-                    <Checkbox
+                    {/* <Checkbox
                     // indeterminate={numSelected > 0 && numSelected < rowCount}
-                    checked={isSelectedAll}
+                    checked={
+                        // numSelected === rowCount ||
+                        (
+                            pageData.size === rowCount
+                            // (pageData.size === rowCount) ||
+                            // (pageData.totalElements === numSelected)
+                        )
+                    }
                     onChange={onSelectAllClick}
-                    />
+                    /> */}
                 </TableCell>
                 {rows.map(row => {
                     return (
@@ -51,12 +139,12 @@ class EnhancedTableHead extends React.Component {
 }
 
 EnhancedTableHead.propTypes = {
-    // numSelected: PropTypes.number.isRequired,
     // onRequestSort: PropTypes.func.isRequired,
-    onSelectAllClick: PropTypes.func.isRequired,
+    // numSelected: PropTypes.number.isRequired,
+    // onSelectAllClick: PropTypes.func.isRequired,
     order: PropTypes.string.isRequired,
     orderBy: PropTypes.string.isRequired,
-    rowCount: PropTypes.number.isRequired,
+    // rowCount: PropTypes.number.isRequired,
   };
 
 
@@ -119,30 +207,36 @@ class CustomizedTable extends React.Component {
             order:'asc',
             orderBy:'firstName',
             selected:[],
-            isSelectedAll: false
+            newSelected:[],
+            currentPage: 0
+            // isSelectedAll: false
             // employees: this.props.employees            
         }
     }
 
     handleSelectAllClick(event){
         const { employees } = this.props;
-        
+        const { selected } = this.state;
+        let newSelected = employees.map(employee => employee._links.self.href);
         if(event.target.checked){
-            this.setState({ selected: employees.map(employee => employee._links.self.href), isSelectedAll: true }
-            
-        );
-                        
+            // this.setState({ selected: employees.map(employee => employee._links.self.href), isSelectedAll: true }
+            this.setState({ selected: selected.concat(newSelected)  });                        
             return;
         }
-        this.setState({ selected: [], isSelectedAll: false});
+
+        // employees.map(employee => employee._links.self.href)
+        this.setState({ selected: []});
 
     }
 
     handleClick(event, id) {
-        const { selected } = this.state;
+        let {selected } = this.state;
+        const {pageData } = this.props;
         const selectedIndex = selected.indexOf(id);
         let newSelected = [];
-    
+        
+        this.setState({currentPage:  pageData.number});
+        
         if (selectedIndex === -1) {
           newSelected = newSelected.concat(selected, id);
         } else if (selectedIndex === 0) {
@@ -155,6 +249,9 @@ class CustomizedTable extends React.Component {
             selected.slice(selectedIndex + 1)
           );
         }
+
+
+
         this.setState({ selected: newSelected });
       };
 
@@ -162,27 +259,31 @@ class CustomizedTable extends React.Component {
     // isSelected = function(id){
     //     return this.state.selected.indexOf(id) !== -1;
     // }
+    
     render(){
-        const { classes } = this.props;        
-        const { theme,selected } = this.props;
-        const { employees, links } = this.props;
+        const {pageData, employees, links, classes } = this.props;        
+        const { theme } = this.props;
+        const { selected } = this.state
 
         var pagination = <Pagination links={links} onNavigate={this.props.onNavigate} />
         return (
             <Paper className={classes.root}>
+            <EnhancedTableToolbar numSelected={selected.length} />
              <div className={classes.tableWrapper}>
                 <Table className={classes.table}>
                 <EnhancedTableHead
-                    // numSelected={selected.length}
+                    numSelected={selected.length}
                     order={this.state.order}
                     orderBy={this.state.orderBy}
                     onSelectAllClick={this.handleSelectAllClick}
                     rowCount={employees.length}                    
-                    isSelectedAll={this.state.isSelectedAll}
+                    pageData={pageData}
+                   // isSelectedAll={this.state.isSelectedAll}
                 />
-                <TableBody >
+                <TableBody >                        
                         {employees.map(employee => {
-                        const isSelected = this.isSelected(employee._links.self.href) || this.state.isSelectedAll;
+                        const isSelected = this.isSelected(employee._links.self.href);                        
+                        
                         return (                            
                             <TableRow 
                                     role="checkbox"

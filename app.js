@@ -17,7 +17,7 @@ class App extends React.Component {
 
     constructor(props) {
         super(props);
-        this.state = {employees: [], attributes: [], pageSize: 3, links: {}};        
+        this.state = {employees: [], attributes: [], pageSize: 2, links: {}, pageData: {} };        
         this.onNavigate = this.onNavigate.bind(this);
     }
 
@@ -25,9 +25,10 @@ class App extends React.Component {
         this.fetchJSON(uri).then(employeeCollection => {
             this.setState({
                 employees: employeeCollection._embedded.employees,
-                // attributes: this.state.attributes,
+                 // attributes: this.state.attributes,
                 pageSize: this.state.pageSize,
-                links: employeeCollection._links
+                links: employeeCollection._links,
+                pageData: employeeCollection.page                
             });
         }).catch(error => {
             console.log(error)
@@ -67,6 +68,7 @@ class App extends React.Component {
                 links: empResponse._links,
                 page: 0,
                 selected: [],
+                pageData: empResponse.page
             })
         }).catch(error => {
             console.log(error)
@@ -84,6 +86,7 @@ class App extends React.Component {
                 employees = {this.state.employees} 
                 links = {this.state.links}  
                 onNavigate = {this.onNavigate}
+                pageData = {this.state.pageData}
                 />
         {/* <EmployeeList 
             employees = {this.state.employees}  
@@ -128,6 +131,7 @@ class EmployeeList extends React.Component {
         e.preventDefault();
         this.props.onNavigate(this.props.links.last.href);
     }
+    
 
     
     render(){
