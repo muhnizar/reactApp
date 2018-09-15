@@ -19,7 +19,14 @@ class App extends React.Component {
         super(props);
         this.state = {employees: [], attributes: [], pageSize: 2, links: {}, pageData: {} };        
         this.onNavigate = this.onNavigate.bind(this);
+        this.updatePageSize = this.updatePageSize.bind(this);
     }
+
+    updatePageSize(pageSize) {
+		if (pageSize !== this.state.pageSize) {
+			this.loadFromServer(pageSize);
+		}
+	}
 
     onNavigate(uri){
         this.fetchJSON(uri).then(employeeCollection => {
@@ -86,6 +93,7 @@ class App extends React.Component {
                 employees = {this.state.employees} 
                 links = {this.state.links}  
                 onNavigate = {this.onNavigate}
+                updatePageSize = {this.updatePageSize}
                 pageData = {this.state.pageData}
                 />
         {/* <EmployeeList 

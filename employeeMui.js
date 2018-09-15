@@ -1,3 +1,6 @@
+
+const ReactDOM = require('react-dom');
+
 import React from 'react';
 import classNames from 'classnames';
 import PropTypes from 'prop-types';
@@ -16,8 +19,6 @@ import Typography from '@material-ui/core/Typography';
 import Tooltip from '@material-ui/core/Tooltip';
 import DeleteIcon from '@material-ui/icons/Delete';
 import IconButton from '@material-ui/core/IconButton';
-import FilterListIcon from '@material-ui/icons/FilterList';
-
 
 const toolbarStyles = theme => ({
     root: {
@@ -60,7 +61,7 @@ let EnhancedTableToolbar = props => {
             </Typography>
           ) : (
             <Typography variant="title" id="tableTitle">
-              Employee
+              Family
             </Typography>
           )}
         </div>
@@ -203,14 +204,13 @@ class CustomizedTable extends React.Component {
     constructor(props) {
         super(props);                
         this.handleSelectAllClick = this.handleSelectAllClick.bind(this);
+        // this.handleInput =  this.handleInput.bind(this);
         this.state = {
             order:'asc',
             orderBy:'firstName',
             selected:[],
-            newSelected:[],
-            currentPage: 0
-            // isSelectedAll: false
-            // employees: this.props.employees            
+            newSelected:[],                        
+
         }
     }
 
@@ -250,10 +250,9 @@ class CustomizedTable extends React.Component {
           );
         }
 
-
-
         this.setState({ selected: newSelected });
-      };
+    };
+  
 
     isSelected = id => this.state.selected.indexOf(id) !== -1;
     // isSelected = function(id){
@@ -265,9 +264,9 @@ class CustomizedTable extends React.Component {
         const { theme } = this.props;
         const { selected } = this.state
 
-        var pagination = <Pagination links={links} onNavigate={this.props.onNavigate} />
+        var pagination = <Pagination updatePageSize={this.props.updatePageSize} links={links} onNavigate={this.props.onNavigate} />
         return (
-            <Paper className={classes.root}>
+            <Paper className={classes.root}>            
             <EnhancedTableToolbar numSelected={selected.length} />
              <div className={classes.tableWrapper}>
                 <Table className={classes.table}>
