@@ -17,9 +17,47 @@ class App extends React.Component {
 
     constructor(props) {
         super(props);
-        this.state = {employees: [], attributes: [], pageSize: 2, links: {}, pageData: {} };        
+        this.state = {employees: [], attributes: [], pageSize: 2, links: {}, pageData: {}, selected: [] };        
         this.onNavigate = this.onNavigate.bind(this);
         this.updatePageSize = this.updatePageSize.bind(this);
+        this.onDelete = this.onDelete.bind(this);
+        this.handleClick = this.handleClick.bind(this);
+    }
+
+    handleClick(event, id) {
+        // let {selected } = this.props;
+        // const {pageData } = this.props;
+        
+        const {selected } = this.state;
+        const selectedIndex = selected.indexOf(id);
+        let newSelected = [];
+        
+        // this.setState({currentPage:  pageData.number});
+        
+        if (selectedIndex === -1) {
+          newSelected = newSelected.concat(selected, id);
+        } else if (selectedIndex === 0) {
+          newSelected = newSelected.concat(selected.slice(1));
+        } else if (selectedIndex === selected.length - 1) {
+          newSelected = newSelected.concat(selected.slice(0, -1));
+        } else if (selectedIndex > 0) {
+          newSelected = newSelected.concat(
+            selected.slice(0, selectedIndex),
+            selected.slice(selectedIndex + 1)
+          );
+        }
+
+        this.setState({ selected: newSelected });
+    };
+
+    onDelete(employee) {        
+        fetch(employee, {
+            method:'DELETE'
+        }).then((json) => {            
+            this.loadFromServer(this.state.pageSize);
+        }).catch(error => {
+            console.log(error)
+        })
     }
 
     updatePageSize(pageSize) {
@@ -95,6 +133,9 @@ class App extends React.Component {
                 onNavigate = {this.onNavigate}
                 updatePageSize = {this.updatePageSize}
                 pageData = {this.state.pageData}
+                onDelete = {this.onDelete}
+                selected = {this.state.selected}
+                onClick = {this.handleClick}                
                 />
         {/* <EmployeeList 
             employees = {this.state.employees}  

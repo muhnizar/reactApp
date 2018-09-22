@@ -45,49 +45,63 @@ const toolbarStyles = theme => ({
     },
   });
 
-let EnhancedTableToolbar = props => {
-    const { numSelected, classes } = props;
-  
-    return (
-      <Toolbar
-        className={classNames(classes.root, {
-          [classes.highlight]: numSelected > 0,
-        })}
-      >
-        <div className={classes.title}>
-          {numSelected > 0 ? (
-            <Typography color="inherit" variant="subheading">
-              {numSelected} selected
-            </Typography>
-          ) : (
-            <Typography variant="title" id="tableTitle">
-              Family
-            </Typography>
-          )}
-        </div>
-        <div className={classes.spacer} />
-        <div className={classes.actions}>
-          {numSelected > 0 ? (
-            <Tooltip title="Delete">
-              <IconButton aria-label="Delete">
-                <DeleteIcon />
-              </IconButton>
-            </Tooltip>
-          ) : (
-            <Tooltip title="Filter list">
-              <IconButton aria-label="Filter list">
-                {/* <FilterListIcon /> */}
-              </IconButton>
-            </Tooltip>
-          )}
-        </div>
-      </Toolbar>
-    );
+class EnhancedTableToolbar extends React.Component {
+    constructor(props) {
+        super(props);                 
+        this.handleDelete = this.handleDelete.bind(this);
+    }
+    
+    handleDelete(event) {
+        let {selected, onDelete} = this.props;
+        selected.map(employee => {
+            onDelete(employee)
+        });
+    }
+
+    render(){
+            const { selected, classes } = this.props;
+            let numSelected = selected.length;
+            return (
+                <Toolbar
+                className={classNames(classes.root, {
+                    [classes.highlight]: numSelected > 0,
+                })}
+                >
+                <div className={classes.title}>
+                    {numSelected > 0 ? (
+                    <Typography color="inherit" variant="subheading">
+                        {numSelected} selected
+                    </Typography>
+                    ) : (
+                    <Typography variant="title" id="tableTitle">
+                        Family
+                    </Typography>
+                    )}
+                </div>
+                <div className={classes.spacer} />
+                <div className={classes.actions}>
+                    {numSelected > 0 ? (
+                    <Tooltip title="Delete">
+                        <IconButton aria-label="Delete">
+                        <DeleteIcon onClick={this.handleDelete} />
+                        </IconButton>
+                    </Tooltip>
+                    ) : (
+                    <Tooltip title="Filter list">
+                        <IconButton aria-label="Filter list">
+                        {/* <FilterListIcon /> */}
+                        </IconButton>
+                    </Tooltip>
+                    )}
+                </div>
+                </Toolbar>
+            );    
+    }     
   };
   
   EnhancedTableToolbar.propTypes = {
     classes: PropTypes.object.isRequired,
-    numSelected: PropTypes.number.isRequired,
+    // numSelected: PropTypes.number.isRequired,
   };
 
 EnhancedTableToolbar = withStyles(toolbarStyles)(EnhancedTableToolbar);
@@ -203,80 +217,80 @@ class CustomizedTable extends React.Component {
     
     constructor(props) {
         super(props);                
-        this.handleSelectAllClick = this.handleSelectAllClick.bind(this);
+        // this.handleSelectAllClick = this.handleSelectAllClick.bind(this);
         // this.handleInput =  this.handleInput.bind(this);
         this.state = {
             order:'asc',
             orderBy:'firstName',
-            selected:[],
-            newSelected:[],                        
-
+             // selected:[],
+            // newSelected:[],
         }
     }
 
-    handleSelectAllClick(event){
-        const { employees } = this.props;
-        const { selected } = this.state;
-        let newSelected = employees.map(employee => employee._links.self.href);
-        if(event.target.checked){
-            // this.setState({ selected: employees.map(employee => employee._links.self.href), isSelectedAll: true }
-            this.setState({ selected: selected.concat(newSelected)  });                        
-            return;
-        }
+    // handleSelectAllClick(event){
+    //     const { employees } = this.props;
+    //     const { selected } = this.state;
+    //     let newSelected = employees.map(employee => employee._links.self.href);
+    //     if(event.target.checked){
+    //         // this.setState({ selected: employees.map(employee => employee._links.self.href), isSelectedAll: true }
+    //         this.setState({ selected: selected.concat(newSelected)  });                        
+    //         return;
+    //     }
 
-        // employees.map(employee => employee._links.self.href)
-        this.setState({ selected: []});
+    //     // employees.map(employee => employee._links.self.href)
+    //     this.setState({ selected: []});
 
-    }
+    // }
 
-    handleClick(event, id) {
-        let {selected } = this.state;
-        const {pageData } = this.props;
-        const selectedIndex = selected.indexOf(id);
-        let newSelected = [];
+    // handleClick(event, id) {
+    //     // let {selected } = this.state;
+    //     let {selected } = this.props;
+    //     const {pageData } = this.props;
+    //     const selectedIndex = selected.indexOf(id);
+    //     let newSelected = [];
         
-        this.setState({currentPage:  pageData.number});
+    //     this.setState({currentPage:  pageData.number});
         
-        if (selectedIndex === -1) {
-          newSelected = newSelected.concat(selected, id);
-        } else if (selectedIndex === 0) {
-          newSelected = newSelected.concat(selected.slice(1));
-        } else if (selectedIndex === selected.length - 1) {
-          newSelected = newSelected.concat(selected.slice(0, -1));
-        } else if (selectedIndex > 0) {
-          newSelected = newSelected.concat(
-            selected.slice(0, selectedIndex),
-            selected.slice(selectedIndex + 1)
-          );
-        }
+    //     if (selectedIndex === -1) {
+    //       newSelected = newSelected.concat(selected, id);
+    //     } else if (selectedIndex === 0) {
+    //       newSelected = newSelected.concat(selected.slice(1));
+    //     } else if (selectedIndex === selected.length - 1) {
+    //       newSelected = newSelected.concat(selected.slice(0, -1));
+    //     } else if (selectedIndex > 0) {
+    //       newSelected = newSelected.concat(
+    //         selected.slice(0, selectedIndex),
+    //         selected.slice(selectedIndex + 1)
+    //       );
+    //     }
 
-        this.setState({ selected: newSelected });
-    };
+    //     this.setState({ selected: newSelected });
+    // };
   
-
-    isSelected = id => this.state.selected.indexOf(id) !== -1;
+    isSelected = id => this.props.selected.indexOf(id) !== -1;
     // isSelected = function(id){
     //     return this.state.selected.indexOf(id) !== -1;
     // }
     
     render(){
-        const {pageData, employees, links, classes } = this.props;        
-        const { theme } = this.props;
-        const { selected } = this.state
+        const {onClick, selected, pageData, employees, links, classes } = this.props;        
+        // const { theme } = this.props;
+        // const { selected } = this.state;
 
-        var pagination = <Pagination updatePageSize={this.props.updatePageSize} links={links} onNavigate={this.props.onNavigate} />
+        let pagination = <Pagination updatePageSize={this.props.updatePageSize} links={links} onNavigate={this.props.onNavigate} />
         return (
             <Paper className={classes.root}>            
-            <EnhancedTableToolbar numSelected={selected.length} />
+            <EnhancedTableToolbar onDelete={this.props.onDelete} selected={selected}/>
              <div className={classes.tableWrapper}>
                 <Table className={classes.table}>
                 <EnhancedTableHead
-                    numSelected={selected.length}
+                    // numSelected={selected.length}
                     order={this.state.order}
                     orderBy={this.state.orderBy}
-                    onSelectAllClick={this.handleSelectAllClick}
+                    // onSelectAllClick={this.handleSelectAllClick}
                     rowCount={employees.length}                    
                     pageData={pageData}
+                    
                    // isSelectedAll={this.state.isSelectedAll}
                 />
                 <TableBody >                        
@@ -288,7 +302,8 @@ class CustomizedTable extends React.Component {
                                     role="checkbox"
                                     hover
                                     key={employee._links.self.href}
-                                    onClick={event => this.handleClick(event, employee._links.self.href)}
+                                    // onClick={event => handleClick(event, employee._links.self.href)}
+                                    onClick={event => onClick(event, employee._links.self.href)}
                                     selected={isSelected}
                                     aria-checked={isSelected}                            >
                                 <TableCell padding="checkbox">
