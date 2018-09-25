@@ -19,6 +19,7 @@ import Typography from '@material-ui/core/Typography';
 import Tooltip from '@material-ui/core/Tooltip';
 import DeleteIcon from '@material-ui/icons/Delete';
 import IconButton from '@material-ui/core/IconButton';
+import Fade from '@material-ui/core/Fade';
 
 const toolbarStyles = theme => ({
     root: {
@@ -49,6 +50,10 @@ class EnhancedTableToolbar extends React.Component {
     constructor(props) {
         super(props);                 
         this.handleDelete = this.handleDelete.bind(this);
+        this.state = {
+                status:'',
+                updated:0
+            }
     }
     
     handleDelete(event) {
@@ -56,27 +61,44 @@ class EnhancedTableToolbar extends React.Component {
         selected.map(employee => {
             onDelete(employee)
         });
+
+        this.setState({ status: 'DELETE', updated:selected.length})
+
+        setTimeout(() => {
+            this.setState({
+              status: '',
+            });
+          }, 1000);
     }
 
     render(){
             const { selected, classes } = this.props;
+            const {updated ,status} = this.state;
             let numSelected = selected.length;
-            return (
-                <Toolbar
-                className={classNames(classes.root, {
-                    [classes.highlight]: numSelected > 0,
-                })}
-                >
-                <div className={classes.title}>
-                    {numSelected > 0 ? (
-                    <Typography color="inherit" variant="subheading">
-                        {numSelected} selected
-                    </Typography>
-                    ) : (
+            let typography;
+            if (status !== '' ||  numSelected > 0){
+                typography = <Typography color="inherit" variant="subheading">
+                     {status === 'DELETE' ? updated + ' deleted' : numSelected + ' selected' }    
+                            </Typography>
+            } else {
+                typography = 
+                <Fade in={true} timeout={300}>
                     <Typography variant="title" id="tableTitle">
                         Family
                     </Typography>
-                    )}
+                </Fade>
+            }
+                        
+
+            return (
+                
+                <Toolbar
+                className={classNames(classes.root, {
+                    [classes.highlight]: numSelected > 0 || status !== '',
+                })}
+                >                
+                <div className={classes.title}>
+                    {typography}                
                 </div>
                 <div className={classes.spacer} />
                 <div className={classes.actions}>
@@ -95,6 +117,7 @@ class EnhancedTableToolbar extends React.Component {
                     )}
                 </div>
                 </Toolbar>
+                
             );    
     }     
   };
@@ -157,8 +180,8 @@ EnhancedTableHead.propTypes = {
     // onRequestSort: PropTypes.func.isRequired,
     // numSelected: PropTypes.number.isRequired,
     // onSelectAllClick: PropTypes.func.isRequired,
-    order: PropTypes.string.isRequired,
-    orderBy: PropTypes.string.isRequired,
+    // order: PropTypes.string.isRequired,
+    // orderBy: PropTypes.string.isRequired,
     // rowCount: PropTypes.number.isRequired,
   };
 
@@ -220,8 +243,8 @@ class CustomizedTable extends React.Component {
         // this.handleSelectAllClick = this.handleSelectAllClick.bind(this);
         // this.handleInput =  this.handleInput.bind(this);
         this.state = {
-            order:'asc',
-            orderBy:'firstName',
+            // order:'asc',
+            // orderBy:'firstName',
              // selected:[],
             // newSelected:[],
         }

@@ -54,6 +54,7 @@ class App extends React.Component {
         fetch(employee, {
             method:'DELETE'
         }).then((json) => {            
+            this.setState({selected: []});
             this.loadFromServer(this.state.pageSize);
         }).catch(error => {
             console.log(error)
@@ -111,8 +112,7 @@ class App extends React.Component {
                 attributes: Object.keys(schema.properties),
                 pageSize: pageSize,
                 links: empResponse._links,
-                page: 0,
-                selected: [],
+                page: 0,                
                 pageData: empResponse.page
             })
         }).catch(error => {
@@ -202,22 +202,7 @@ class EmployeeList extends React.Component {
             navLinks.push(<button onClick={this.handleNavLast} key="last">&gt;&gt;</button>)
         }
 
-        return (
-        // <div>
-        //     <table>
-        //         <tbody>
-        //         <tr>
-        //             <th>First Name</th>
-        //             <th>Last Name</th>
-        //             <th>Description</th>        
-        //         </tr>
-        //         {employees}
-        //         </tbody>
-        //     </table>            
-        //     <div> 
-        //         {navLinks}
-        //     </div>
-        // </div>
+        return (        
         <Paper className={classes.root}> 
             <Table className={classes.table}>
                 <TableHead>
