@@ -2,7 +2,7 @@
 
 const React = require('react');
 const ReactDOM = require('react-dom');
-
+const stompClient = require('./websocket-listener');
 // import Button from '@material-ui/core/Button';
 import Table from '@material-ui/core/Table';
 import TableBody from '@material-ui/core/TableBody';
@@ -11,7 +11,6 @@ import TableHead from '@material-ui/core/TableHead';
 import TableRow from '@material-ui/core/TableRow';
 import Paper from '@material-ui/core/Paper';
 import EmployeeMui from './employeeMui';
-import Demo from './demo';
 
 class App extends React.Component {
 
@@ -22,6 +21,25 @@ class App extends React.Component {
         this.updatePageSize = this.updatePageSize.bind(this);
         this.onDelete = this.onDelete.bind(this);
         this.handleClick = this.handleClick.bind(this);
+        this.refreshCurrentPage = this.refreshCurrentPage.bind(this);
+    }
+
+    refreshCurrentPage(message) {
+
+        this.fetchJSON('http://localhost:8080/api/employees?size=2&page='+this.state.pageData.number).then(employeeCollection => {
+            this.setState({
+                employees: employeeCollection._embedded.employees,
+                 // attributes: this.state.attributes,
+                pageSize: this.state.pageSize,
+                links: employeeCollection._links,
+                pageData: employeeCollection.page                
+            });
+        }).catch(error => {
+            console.log(error)
+        });
+
+            
+ 
     }
 
     handleClick(event, id) {
@@ -122,8 +140,14 @@ class App extends React.Component {
  
     componentDidMount() {
         this.loadFromServer(this.state.pageSize);
+
+        stompClient.register([
+            {route: '/topic/newEmployee', callback: this.refreshCurrentPage},
+            {route: '/topic/updateEmployee', callback: this.refreshCurrentPage},
+            {route: '/topic/deleteEmployee', callback: this.refreshCurrentPage}
+        ]);
     }
-    
+        
     render() {
         return (        
             <div>
@@ -181,6 +205,34 @@ class EmployeeList extends React.Component {
         this.props.onNavigate(this.props.links.last.href);
     }
     
+
+        // follow(client, root, [{
+        //     rel: 'employees',
+        //     params: {
+        //         size: this.state.pageSize,
+        //         page: this.state.page.number
+        //     }
+        // }]).then(employeeCollection => {
+        //     this.links = employeeCollection.entity._links;
+        //     this.page = employeeCollection.entity.page;
+    
+        //     return employeeCollection.entity._embedded.employees.map(employee => {
+        //         return client({
+        //             method: 'GET',
+        //             path: employee._links.self.href
+        //         })
+        //     });
+        // }).then(employeePromises => {
+        //     return when.all(employeePromises);
+        // }).then(employees => {
+        //     this.setState({
+        //         page: this.page,
+        //         employees: employees,
+        //         attributes: Object.keys(this.schema.properties),
+        //         pageSize: this.state.pageSize,
+        //         links: this.links
+        //     });
+        // });
 
     
     render(){
