@@ -11,6 +11,8 @@
     "@material-ui/core": "^1.5.1",
     "react": "^16.4.2",
     "react-dom": "^16.4.2",
+    "sockjs-client": "^1.0.3",
+    "stompjs": "^2.3.3",
     "webpack": "^3.0.0",
     "webpack-dev-server": "^2.7.1"
   },

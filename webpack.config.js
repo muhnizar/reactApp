@@ -23,6 +23,9 @@ var config = {
           }
        ]
     },
+    node: {
+        net: 'empty'
+    }
     
  }
  module.exports = config;

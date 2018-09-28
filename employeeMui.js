@@ -7,6 +7,9 @@ import PropTypes from 'prop-types';
 import { withStyles, withTheme } from '@material-ui/core/styles';
 import Table from '@material-ui/core/Table';
 import TableBody from '@material-ui/core/TableBody';
+import TableFooter from '@material-ui/core/TableFooter';
+import TablePagination from '@material-ui/core/TablePagination';
+
 import TableCell from '@material-ui/core/TableCell';
 import TableHead from '@material-ui/core/TableHead';
 import TableRow from '@material-ui/core/TableRow';
@@ -345,6 +348,21 @@ class CustomizedTable extends React.Component {
                             );
                         })}
                 </TableBody>
+                {/* <TableFooter>
+              <TableRow>
+                <TablePagination
+                  colSpan={3}
+                //   count={pageData.totalElements}
+                count={11}
+                  rowsPerPage={2}
+                //   page={pageData.number}
+                page={0}
+                  onChangePage={this.props.updatePageSize}
+                  onChangeRowsPerPage={this.props.updatePageSize}
+                  ActionsComponent={Pagination}
+                />
+              </TableRow>
+            </TableFooter> */}
                 </Table>
                 </div>
                 {pagination}
