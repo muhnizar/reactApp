@@ -16,8 +16,9 @@ class App extends React.Component {
 
     constructor(props) {
         super(props);
-        this.state = {employees: [], attributes: [], pageSize: 2, links: {}, pageData: {}, selected: [] };        
+        this.state = {employees: [], attributes: [], pageSize: 5, links: {}, pageData: {}, selected: [] };        
         this.onNavigate = this.onNavigate.bind(this);
+        this.handleNavigate = this.handleNavigate.bind(this);
         this.updatePageSize = this.updatePageSize.bind(this);
         this.onDelete = this.onDelete.bind(this);
         this.handleClick = this.handleClick.bind(this);
@@ -37,14 +38,9 @@ class App extends React.Component {
         }).catch(error => {
             console.log(error)
         });
-
-            
- 
     }
 
     handleClick(event, id) {
-        // let {selected } = this.props;
-        // const {pageData } = this.props;
         
         const {selected } = this.state;
         const selectedIndex = selected.indexOf(id);
@@ -68,23 +64,40 @@ class App extends React.Component {
         this.setState({ selected: newSelected });
     };
 
-    onDelete(employee) {        
-        fetch(employee, {
+    onDelete(uri) {        
+        fetch(uri, {
             method:'DELETE'
-        }).then((json) => {            
+        }).then((response) => {                        
+            if (!response.ok) {
+                throw new Error('HTTP error ' + response.status);
+            }
             this.setState({selected: []});
-            this.loadFromServer(this.state.pageSize);
+            this.loadFromServer(this.state.pageSize);        
+
+            return response;
         }).catch(error => {
             console.log(error)
         })
+        
     }
 
-    updatePageSize(pageSize) {
-		if (pageSize !== this.state.pageSize) {
-			this.loadFromServer(pageSize);
+    updatePageSize(event) {
+        if (event.target.value !== this.state.pageSize) {
+			this.loadFromServer(event.target.value);
 		}
 	}
 
+    handleNavigate(step){
+        if(step === 'prev'){
+            this.onNavigate(this.state.links.prev.href)            
+        }else if (step === 'next'){
+            this.onNavigate(this.state.links.next.href)
+        }else if (step === 'first'){
+            this.onNavigate(this.state.links.first.href)
+        }else if (step === 'last'){
+            this.onNavigate(this.state.links.last.href)
+        }
+    }
     onNavigate(uri){
         this.fetchJSON(uri).then(employeeCollection => {
             this.setState({
@@ -147,19 +160,19 @@ class App extends React.Component {
             {route: '/topic/deleteEmployee', callback: this.refreshCurrentPage}
         ]);
     }
-        
+
     render() {
-        return (        
+        return (    
             <div>
                 <EmployeeMui 
-                employees = {this.state.employees} 
-                links = {this.state.links}  
-                onNavigate = {this.onNavigate}
-                updatePageSize = {this.updatePageSize}
-                pageData = {this.state.pageData}
-                onDelete = {this.onDelete}
-                selected = {this.state.selected}
-                onClick = {this.handleClick}                
+                    employees = {this.state.employees}
+                    links = {this.state.links}  
+                    onNavigate = {this.handleNavigate}
+                    updatePageSize = {this.updatePageSize}
+                    pageData = {this.state.pageData}
+                    onDelete = {this.onDelete}
+                    selected = {this.state.selected}
+                    onClick = {this.handleClick}                
                 />
         {/* <EmployeeList 
             employees = {this.state.employees}  

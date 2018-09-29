@@ -1,2 +1,10 @@
 .gitignore
-node_modules
+/node_modules/
+node_modules/sockjs-client/dist/sockjs.min.js.map
+node_modules/sockjs-client/dist/sockjs.js.map
+node_modules/sockjs-client/dist/sockjs.min.js
+node_modules/sockjs-client/lib/location.js
+node_modules/sockjs-client/lib/main.js
+node_modules/sockjs-client/lib/version.js
+node_modules/sockjs-client/lib/transport/browser/abstract-xhr.js
+node_modules/sockjs-client/lib/utils/iframe.js

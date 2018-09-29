@@ -9,7 +9,6 @@ import Table from '@material-ui/core/Table';
 import TableBody from '@material-ui/core/TableBody';
 import TableFooter from '@material-ui/core/TableFooter';
 import TablePagination from '@material-ui/core/TablePagination';
-
 import TableCell from '@material-ui/core/TableCell';
 import TableHead from '@material-ui/core/TableHead';
 import TableRow from '@material-ui/core/TableRow';
@@ -23,6 +22,11 @@ import Tooltip from '@material-ui/core/Tooltip';
 import DeleteIcon from '@material-ui/icons/Delete';
 import IconButton from '@material-ui/core/IconButton';
 import Fade from '@material-ui/core/Fade';
+import FirstPageIcon from '@material-ui/icons/FirstPage';
+import KeyboardArrowLeft from '@material-ui/icons/KeyboardArrowLeft';
+import KeyboardArrowRight from '@material-ui/icons/KeyboardArrowRight';
+import LastPageIcon from '@material-ui/icons/LastPage';
+import pagination from './pagination';
 
 const toolbarStyles = theme => ({
     root: {
@@ -87,12 +91,11 @@ class EnhancedTableToolbar extends React.Component {
                 typography = 
                 <Fade in={true} timeout={300}>
                     <Typography variant="title" id="tableTitle">
-                        Family
+                        My Family
                     </Typography>
                 </Fade>
             }
                         
-
             return (
                 
                 <Toolbar
@@ -300,24 +303,28 @@ class CustomizedTable extends React.Component {
     
     render(){
         const {onClick, selected, pageData, employees, links, classes } = this.props;        
-        // const { theme } = this.props;
-        // const { selected } = this.state;
+        let count = 0;
+        let rowsPerPage = 0; 
+        let page = 0;
+        if (JSON.stringify(pageData) !== "{}"){
+            count = pageData.totalElements; 
+            rowsPerPage = pageData.size;
+            page = pageData.number ;
+        }
 
-        let pagination = <Pagination updatePageSize={this.props.updatePageSize} links={links} onNavigate={this.props.onNavigate} />
+        // custom pagination
+        // let pagination = <Pagination updatePageSize={this.props.updatePageSize} links={links} onNavigate={this.props.onNavigate} />
+
         return (
             <Paper className={classes.root}>            
             <EnhancedTableToolbar onDelete={this.props.onDelete} selected={selected}/>
              <div className={classes.tableWrapper}>
                 <Table className={classes.table}>
                 <EnhancedTableHead
-                    // numSelected={selected.length}
                     order={this.state.order}
                     orderBy={this.state.orderBy}
-                    // onSelectAllClick={this.handleSelectAllClick}
                     rowCount={employees.length}                    
                     pageData={pageData}
-                    
-                   // isSelectedAll={this.state.isSelectedAll}
                 />
                 <TableBody >                        
                         {employees.map(employee => {
@@ -348,24 +355,22 @@ class CustomizedTable extends React.Component {
                             );
                         })}
                 </TableBody>
-                {/* <TableFooter>
+            <TableFooter>
               <TableRow>
                 <TablePagination
-                  colSpan={3}
-                //   count={pageData.totalElements}
-                count={11}
-                  rowsPerPage={2}
-                //   page={pageData.number}
-                page={0}
-                  onChangePage={this.props.updatePageSize}
-                  onChangeRowsPerPage={this.props.updatePageSize}
-                  ActionsComponent={Pagination}
+                    colSpan={3}
+                    count={count}
+                    rowsPerPage={rowsPerPage}
+                    page={page}
+                    onChangePage={this.props.onNavigate}
+                    onChangeRowsPerPage={this.props.updatePageSize}
+                    ActionsComponent={TablePaginationActionsWrapped}
                 />
               </TableRow>
-            </TableFooter> */}
+            </TableFooter>
                 </Table>
                 </div>
-                {pagination}
+            {/* {pagination} */}
       </Paper>
         )
     }
@@ -377,3 +382,129 @@ CustomizedTable.propTypes = {
   };
 
 export default withStyles(styles)(CustomizedTable);
+
+
+const actionsStyles = theme => ({
+    root: {
+      flexShrink: 0,
+      color: theme.palette.text.secondary,
+      marginLeft: theme.spacing.unit * 2.5,
+    },
+  });
+  
+  class TablePaginationActions extends React.Component {
+
+    constructor(props) {
+        super(props);        
+        this.handleNavFirst = this.handleNavFirst.bind(this);
+        this.handleNavPrev = this.handleNavPrev.bind(this);
+        this.handleNavNext = this.handleNavNext.bind(this);
+        this.handleNavLast = this.handleNavLast.bind(this); 
+        this.handleChange =  this.handleChange.bind(this);    
+        // this.state = { rowSize: 2};
+    }
+    
+    handleChange = event => {        
+        let pageSize = event.target.value;
+        if (/^[0-9]+$/.test(pageSize)) {
+            this.props.updatePageSize(pageSize);
+            this.setState({rowSize: pageSize})
+        } else {
+            ReactDOM.findDOMNode(this.refs.pageSize).value =
+                pageSize.substring(0, pageSize.length - 1);
+        }
+    };
+
+    handleNavFirst(e){
+        e.preventDefault();
+        // this.props.onNavigate(this.props.links.first.href);
+        this.props.onChangePage('first');
+    }
+
+    handleNavPrev(e){
+        e.preventDefault();
+        // this.props.onNavigate(this.props.links.prev.href);
+        this.props.onChangePage('prev');
+    }
+
+    handleNavNext(e){        
+        e.preventDefault();
+        // this.props.onNavigate(this.props.links.next.href);
+        this.props.onChangePage('next');
+    }
+
+    handleNavLast(e){
+        e.preventDefault();
+        // this.props.onNavigate(this.props.links.last.href);
+        this.props.onChangePage('last');
+
+    }
+
+    // handleFirstPageButtonClick = event => {
+    //   this.props.onChangePage(event, 0);
+    // };
+  
+    // handleBackButtonClick = event => {
+    //   this.props.onChangePage(event, this.props.page - 1);
+    // };
+  
+    // handleNextButtonClick = event => {
+    //   this.props.onChangePage(event, this.props.page + 1);
+    // };
+  
+    // handleLastPageButtonClick = event => {
+    //   this.props.onChangePage(
+    //     event,
+    //     Math.max(0, Math.ceil(this.props.count / this.props.rowsPerPage) - 1),
+    //   );
+    // };
+  
+    render() {
+      const { classes, count, page, rowsPerPage, theme } = this.props;  
+      return (
+        <div className={classes.root}>
+          <IconButton
+            onClick={this.handleNavFirst}
+            disabled={page === 0}
+            aria-label="First Page"
+          >
+            {theme.direction === 'rtl' ? <LastPageIcon /> : <FirstPageIcon />}
+          </IconButton>
+          <IconButton
+            onClick={this.handleNavPrev}
+            disabled={page === 0}
+            aria-label="Previous Page"
+          >
+            {theme.direction === 'rtl' ? <KeyboardArrowRight /> : <KeyboardArrowLeft />}
+          </IconButton>
+          <IconButton
+            onClick={this.handleNavNext}
+            disabled={page >= Math.ceil(count / rowsPerPage) - 1}
+            aria-label="Next Page"
+          >
+            {theme.direction === 'rtl' ? <KeyboardArrowLeft /> : <KeyboardArrowRight />}
+          </IconButton>
+          <IconButton
+            onClick={this.handleNavLast}
+            disabled={page >= Math.ceil(count / rowsPerPage) - 1}
+            aria-label="Last Page"
+          >
+            {theme.direction === 'rtl' ? <FirstPageIcon /> : <LastPageIcon />}
+          </IconButton>
+        </div>
+      );
+    }
+  }
+  
+  TablePaginationActions.propTypes = {
+    classes: PropTypes.object.isRequired,
+    count: PropTypes.number.isRequired,
+    onChangePage: PropTypes.func.isRequired,
+    page: PropTypes.number.isRequired,
+    rowsPerPage: PropTypes.number.isRequired,
+    theme: PropTypes.object.isRequired
+  };
+  
+  const TablePaginationActionsWrapped = withStyles(actionsStyles, { withTheme: true })(
+    TablePaginationActions
+  );

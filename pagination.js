@@ -9,9 +9,6 @@ import KeyboardArrowLeft from '@material-ui/icons/KeyboardArrowLeft';
 import KeyboardArrowRight from '@material-ui/icons/KeyboardArrowRight';
 import Select from '@material-ui/core/Select';
 import MenuItem from '@material-ui/core/MenuItem';
-import InputLabel from '@material-ui/core/InputLabel';
-
-
 
 const paginationStyles = theme => ({
     root: {
@@ -66,7 +63,9 @@ class CustomizedTablePagination extends React.Component {
     render() {
         const { classes } = this.props;        
         let navLinks = [];
+        
         navLinks.push(            
+            
             <Select ref="rowNum" key="rowNum"
             value={this.state.rowSize}
             onChange={this.handleChange}            
